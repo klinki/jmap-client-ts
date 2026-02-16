@@ -1,14 +1,33 @@
+import { IEmailGetArguments } from './types';
+export type MailboxGetMethod = 'Mailbox/get';
+export type MailboxChangesMethod = 'Mailbox/changes';
+export type MailboxSetMethod = 'Mailbox/set';
+
+export type EmailGetMethod = 'Email/get';
+export type EmailSetMethod = 'Email/set';
+export type EmailChangesMethod = 'Email/changes';
+export type EmailQueryMethod = 'Email/query';
+
+export type EmailSubmissionGetMethod = 'EmailSubmission/get';
+export type EmailSubmissionSetMethod = 'EmailSubmission/set';
+export type EmailSubmissionChangesMethod = 'EmailSubmission/changes';
+
+export type ThreadGetMethod = 'Thread/get';
+export type ThreadChangesMethod = 'Thread/changes';
+
 export type IMethodName =
-  | 'Mailbox/get'
-  | 'Mailbox/changes'
-  | 'Mailbox/set'
-  | 'Email/get'
-  | 'Email/changes'
-  | 'Email/query'
-  | 'Email/set'
-  | 'EmailSubmission/get'
-  | 'EmailSubmission/changes'
-  | 'EmailSubmission/set';
+  | MailboxGetMethod
+  | MailboxChangesMethod
+  | MailboxSetMethod
+  | EmailGetMethod
+  | EmailSetMethod
+  | EmailChangesMethod
+  | EmailQueryMethod
+  | EmailSubmissionGetMethod
+  | EmailSubmissionSetMethod
+  | EmailSubmissionChangesMethod
+  | ThreadGetMethod
+  | ThreadChangesMethod;
 
 export type IErrorName = 'error';
 
@@ -23,7 +42,7 @@ export type IInvocation<ArgumentsType> = [
   methodCallId: string,
 ];
 
-export type IEntityProperties = IMailboxProperties | IEmailProperties | IEmailSubmissionProperties;
+export type IEntityProperties = IMailboxProperties | IEmailProperties | IEmailSubmissionProperties | IThreadProperties;
 
 /**
  * See https://jmap.io/spec-core.html#query
@@ -218,10 +237,22 @@ export type EmailHeader = string;
 
 export type Attachment = File;
 
+interface AdditionalEmailProperties {
+  hasAttachment: boolean;
+  messageId: string;
+  inReplyTo: string[]|null;
+  references: string[]|null;
+  cc: IEmailAddress[]|null;
+  bcc: IEmailAddress[]|null;
+  replyTo: IEmailAddress[]|null;
+  sender: IEmailAddress[]|null;
+  sentAt: Date|null;
+};
+
 /**
  * See https://jmap.io/spec-mail.html#emailget
  */
-export interface IEmailGetArguments extends IGetArguments<IEmailProperties> {
+export interface IEmailGetArguments extends IGetArguments<IEmailProperties & AdditionalEmailProperties> {
   bodyProperties?: string[];
   fetchTextBodyValues?: boolean;
   fetchHTMLBodyValues?: boolean;
@@ -559,3 +590,22 @@ export type IEmailSubmissionSetArguments = ISetArguments<IEmailSubmissionPropert
  * See https://jmap.io/spec-mail.html#emailsubmissionset
  */
 export type IEmailSubmissionSetResponse = ISetResponse<IEmailSubmissionProperties>;
+
+
+/**
+ * See https://jmap.io/spec-mail.html#threads
+ */
+export interface IThreadProperties {
+  id: string;
+  emailIds: string[];
+}
+
+/**
+ * See https://jmap.io/spec-mail.html#threadget
+ */
+export type IThreadGetArguments = IGetArguments<IThreadProperties>;
+
+/**
+ * See https://jmap.io/spec-mail.html#threadchanges
+ */
+export type IThreadChangesArguments = IChangesArguments;
